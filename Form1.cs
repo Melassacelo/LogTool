@@ -106,7 +106,6 @@ namespace LogTool
         {
             btn_AddToData.Enabled = false;
 
-            // Mostra progress dialog
             var progressDialog = new ProgressDialog();
             progressDialog.Show(this);
 
@@ -119,52 +118,90 @@ namespace LogTool
 
                     foreach (var path in filespath)
                     {
-                        int totalLines = File.ReadLines(path).Count();
+                        var newColumns = new HashSet<string>(); // colonne da aggiungere al file
+                        var jsonObjects = ReadJsonObjects(path).Select(FixInvalidJson).Select(JObject.Parse).ToList();
+                        int totalLines = jsonObjects.Count;
                         int processedLines = 0;
 
-                        foreach (var Json in ReadJsonObjects(path))
+                        // 1️⃣ Determina tutte le colonne nuove
+                        foreach (var obj in jsonObjects)
                         {
-                            string fixedJson = FixInvalidJson(Json);
-                            var obj = JObject.Parse(fixedJson);
+                            foreach (var prop in obj.Properties())
+                            {
+                                string col = prop.Name;
+                                if (!ColumnExists(col))
+                                    newColumns.Add(col);
+                            }
+                        }
 
-                            EnsureColumnsExist(obj); // assicura le colonne
-
-                            string query = JsonToQuery(obj);
-
-                            using (var cmd = new SQLiteCommand(query, conn))
+                        // 2️⃣ Aggiungi le nuove colonne tutte in batch
+                        foreach (var col in newColumns)
+                        {
+                            using (var cmd = new SQLiteCommand($"ALTER TABLE Logs ADD COLUMN [{col}] TEXT;", conn))
                             {
                                 cmd.ExecuteNonQuery();
                             }
+                        }
 
-                            processedLines++;
-                            int percentLines = (int)((processedLines / (double)totalLines) * 100);
-
-                            // aggiorna progress bar sul thread UI
-                            this.Invoke(new Action(() =>
+                        // 3️⃣ Inserisci tutti i record in una transazione
+                        using (var transaction = conn.BeginTransaction())
+                        {
+                            foreach (var obj in jsonObjects)
                             {
-                                progressDialog.UpdateProgress(percentLines,
-                                    $"File {processedFiles + 1}/{totalFiles} - Riga {processedLines}/{totalLines}");
-                            }));
+                                string query = JsonToQuery(obj);
+                                using (var cmd = new SQLiteCommand(query, conn, transaction))
+                                {
+                                    cmd.ExecuteNonQuery();
+                                }
+
+                                processedLines++;
+
+                                // aggiorna la progress bar ogni 100 righe
+                                if (processedLines % 100 == 0 || processedLines == totalLines)
+                                {
+                                    int percent = (int)((processedLines / (double)totalLines) * 100);
+                                    this.Invoke(new Action(() =>
+                                        progressDialog.UpdateProgress(percent,
+                                            $"File {processedFiles + 1}/{totalFiles} - Riga {processedLines}/{totalLines}")));
+                                }
+                            }
+
+                            transaction.Commit();
                         }
 
                         processedFiles++;
                     }
                 });
+
+                // aggiorna DataGridView
+                dataGridView1.DataSource = LoadTable("Logs");
             }
             finally
             {
-                // aggiorna la griglia dopo
-                dataGridView1.DataSource = LoadTable("Logs");
-
-                // chiudi progress dialog
                 progressDialog.Close();
-
                 filespath.Clear();
-                lsv_FilesPath.Items.Clear();
-
+                lsv_FilesPath.Clear();
                 btn_AddToData.Enabled = true;
             }
         }
+
+        // controlla se una colonna esiste già nella tabella
+        private bool ColumnExists(string columnName)
+        {
+            using (var cmd = new SQLiteCommand("PRAGMA table_info(Logs);", conn))
+            {
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        if (reader["name"].ToString() == columnName)
+                            return true;
+                    }
+                }
+            }
+            return false;
+        }
+
 
         private string JsonToQuery(JObject obj)
         {
@@ -270,40 +307,6 @@ namespace LogTool
 
             return dt;
         }
-
-        private void EnsureColumnsExist(JObject obj)
-        {
-            foreach (var prop in obj.Properties())
-            {
-                string columnName = prop.Name;
-
-                // Verifica se la colonna esiste già
-                using (var cmd = new SQLiteCommand($"PRAGMA table_info(Logs);", conn))
-                {
-                    var reader = cmd.ExecuteReader();
-                    bool exists = false;
-                    while (reader.Read())
-                    {
-                        if (reader["name"].ToString() == columnName)
-                        {
-                            exists = true;
-                            break;
-                        }
-                    }
-                    reader.Close();
-
-                    // Se non esiste, aggiungila
-                    if (!exists)
-                    {
-                        using (var addCmd = new SQLiteCommand($"ALTER TABLE Logs ADD COLUMN [{columnName}] TEXT;", conn))
-                        {
-                            addCmd.ExecuteNonQuery();
-                        }
-                    }
-                }
-            }
-        }
-
         private void btn_SubmitQuery_Click(object sender, EventArgs e)
         {
             string userQuery = textBox1.Text.Trim();
