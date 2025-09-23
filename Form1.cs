@@ -42,7 +42,7 @@ namespace LogTool
                 {
                     cmd.CommandText = @"
                 CREATE TABLE Logs (
-                    [time] TEXT
+                    [time] DATE
                 );";
                     cmd.ExecuteNonQuery();
                 }
