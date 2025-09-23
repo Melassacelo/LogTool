@@ -35,13 +35,14 @@
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.btn_SubmitQuery = new System.Windows.Forms.Button();
+            this.comboBox1 = new System.Windows.Forms.ComboBox();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
             // btn_UploadFolder
             // 
             this.btn_UploadFolder.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btn_UploadFolder.Location = new System.Drawing.Point(12, 469);
+            this.btn_UploadFolder.Location = new System.Drawing.Point(12, 431);
             this.btn_UploadFolder.Name = "btn_UploadFolder";
             this.btn_UploadFolder.Size = new System.Drawing.Size(377, 23);
             this.btn_UploadFolder.TabIndex = 0;
@@ -53,7 +54,7 @@
             // 
             this.btn_RemoveFolder.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btn_RemoveFolder.Enabled = false;
-            this.btn_RemoveFolder.Location = new System.Drawing.Point(12, 500);
+            this.btn_RemoveFolder.Location = new System.Drawing.Point(12, 462);
             this.btn_RemoveFolder.Name = "btn_RemoveFolder";
             this.btn_RemoveFolder.Size = new System.Drawing.Size(377, 23);
             this.btn_RemoveFolder.TabIndex = 1;
@@ -65,7 +66,7 @@
             // 
             this.btn_AddToData.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btn_AddToData.Enabled = false;
-            this.btn_AddToData.Location = new System.Drawing.Point(12, 529);
+            this.btn_AddToData.Location = new System.Drawing.Point(12, 491);
             this.btn_AddToData.Name = "btn_AddToData";
             this.btn_AddToData.Size = new System.Drawing.Size(377, 38);
             this.btn_AddToData.TabIndex = 2;
@@ -81,7 +82,7 @@
             this.lsv_FilesPath.Location = new System.Drawing.Point(12, 12);
             this.lsv_FilesPath.MultiSelect = false;
             this.lsv_FilesPath.Name = "lsv_FilesPath";
-            this.lsv_FilesPath.Size = new System.Drawing.Size(377, 451);
+            this.lsv_FilesPath.Size = new System.Drawing.Size(377, 413);
             this.lsv_FilesPath.TabIndex = 3;
             this.lsv_FilesPath.UseCompatibleStateImageBehavior = false;
             this.lsv_FilesPath.View = System.Windows.Forms.View.List;
@@ -98,23 +99,22 @@
             this.dataGridView1.Location = new System.Drawing.Point(396, 13);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.ReadOnly = true;
-            this.dataGridView1.Size = new System.Drawing.Size(803, 507);
+            this.dataGridView1.Size = new System.Drawing.Size(590, 469);
             this.dataGridView1.TabIndex = 4;
             // 
             // textBox1
             // 
             this.textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox1.Location = new System.Drawing.Point(396, 537);
+            this.textBox1.Location = new System.Drawing.Point(636, 499);
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(662, 20);
+            this.textBox1.Size = new System.Drawing.Size(209, 20);
             this.textBox1.TabIndex = 5;
             // 
             // btn_SubmitQuery
             // 
-            this.btn_SubmitQuery.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.btn_SubmitQuery.Location = new System.Drawing.Point(1064, 529);
+            this.btn_SubmitQuery.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btn_SubmitQuery.Location = new System.Drawing.Point(851, 491);
             this.btn_SubmitQuery.Name = "btn_SubmitQuery";
             this.btn_SubmitQuery.Size = new System.Drawing.Size(135, 38);
             this.btn_SubmitQuery.TabIndex = 6;
@@ -122,11 +122,22 @@
             this.btn_SubmitQuery.UseVisualStyleBackColor = true;
             this.btn_SubmitQuery.Click += new System.EventHandler(this.btn_SubmitQuery_Click);
             // 
+            // comboBox1
+            // 
+            this.comboBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.comboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBox1.FormattingEnabled = true;
+            this.comboBox1.Location = new System.Drawing.Point(396, 499);
+            this.comboBox1.Name = "comboBox1";
+            this.comboBox1.Size = new System.Drawing.Size(234, 21);
+            this.comboBox1.TabIndex = 7;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1211, 579);
+            this.ClientSize = new System.Drawing.Size(998, 541);
+            this.Controls.Add(this.comboBox1);
             this.Controls.Add(this.btn_SubmitQuery);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.dataGridView1);
@@ -150,6 +161,7 @@
         private System.Windows.Forms.DataGridView dataGridView1;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Button btn_SubmitQuery;
+        private System.Windows.Forms.ComboBox comboBox1;
     }
 }
 

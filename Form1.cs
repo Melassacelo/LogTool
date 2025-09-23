@@ -25,6 +25,7 @@ namespace LogTool
         {
             InitializeComponent();
             InitDatabase();
+
         }
 
 
@@ -46,28 +47,45 @@ namespace LogTool
                     cmd.ExecuteNonQuery();
                 }
             }
-
+            Combobox1Update();
             dataGridView1.DataSource = LoadTable("Logs");
         }
 
+        private void Combobox1Update()
+        {
+            comboBox1.Items.Clear();
+            using (var cmd = new SQLiteCommand("PRAGMA table_info(Logs);", conn))
+            using (var reader = cmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    comboBox1.Items.Add(reader["name"].ToString());
+                }
+            }
+            comboBox1.SelectedIndex = 0;
+        }
         private void btn_UploadFolder_Click(object sender, EventArgs e)
         {
             try
             {
-                using (var fbd = new FolderBrowserDialog())
+                using (var ofd = new OpenFileDialog())
                 {
-                    DialogResult result = fbd.ShowDialog();
+                    ofd.Multiselect = true; // ✅ permette di selezionare più file
+                    ofd.Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*"; // opzionale, filtro
 
-                    if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
+                    DialogResult result = ofd.ShowDialog();
+
+                    if (result == DialogResult.OK && ofd.FileNames.Length > 0)
                     {
-                        foreach (var path in Directory.GetFiles(fbd.SelectedPath))
+                        foreach (var path in ofd.FileNames)
                         {
                             filespath.Add(path);
                             lsv_FilesPath.Items.Add(path);
                         }
                     }
                 }
-                btn_AddToData.Enabled = true;
+
+                btn_AddToData.Enabled = filespath.Count > 0;
             }
             catch (Exception ex)
             {
@@ -175,6 +193,7 @@ namespace LogTool
 
                 // aggiorna DataGridView
                 dataGridView1.DataSource = LoadTable("Logs");
+                Combobox1Update();
             }
             finally
             {
@@ -309,22 +328,32 @@ namespace LogTool
         }
         private void btn_SubmitQuery_Click(object sender, EventArgs e)
         {
-            string userQuery = textBox1.Text.Trim();
+            // Recupera la colonna scelta e il valore cercato
+            string columnName = comboBox1.Text.Trim();
+            string searchValue = textBox1.Text.Trim();
 
-            if (string.IsNullOrWhiteSpace(userQuery))
+            if (string.IsNullOrWhiteSpace(columnName) || string.IsNullOrWhiteSpace(searchValue))
             {
-                MessageBox.Show("Inserisci una query.");
+                MessageBox.Show("Seleziona una colonna e inserisci un valore da cercare.");
                 return;
             }
+
+            // Costruisci query parametrizzata
+            string userQuery = $"SELECT * FROM Logs WHERE [{columnName}] LIKE @value";
 
             try
             {
                 var dt = new DataTable();
 
                 using (var cmd = new SQLiteCommand(userQuery, conn))
-                using (var adapter = new SQLiteDataAdapter(cmd))
                 {
-                    adapter.Fill(dt);
+                    // Parametro con wildcard per LIKE
+                    cmd.Parameters.AddWithValue("@value", "%" + searchValue + "%");
+
+                    using (var adapter = new SQLiteDataAdapter(cmd))
+                    {
+                        adapter.Fill(dt);
+                    }
                 }
 
                 // Aggiorna il DataGridView con i risultati
@@ -335,6 +364,7 @@ namespace LogTool
                 MessageBox.Show("Errore nella query: " + ex.Message);
             }
         }
+
     }
 
     public class ProgressDialog : Form
