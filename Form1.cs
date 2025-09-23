@@ -102,30 +102,68 @@ namespace LogTool
 
         }
 
-        private void btn_AddToData_Click(object sender, EventArgs e)
+        private async void btn_AddToData_Click(object sender, EventArgs e)
         {
-            foreach (var path in filespath)
+            btn_AddToData.Enabled = false;
+
+            // Mostra progress dialog
+            var progressDialog = new ProgressDialog();
+            progressDialog.Show(this);
+
+            try
             {
-                var lines = ReadJsonObjects(path);
-                foreach (var Json in lines)
+                await Task.Run(() =>
                 {
-                    string fixedJson = FixInvalidJson(Json);
-                    var obj = JObject.Parse(fixedJson);
+                    int totalFiles = filespath.Count;
+                    int processedFiles = 0;
 
-                    EnsureColumnsExist(obj); // Assicura che tutte le colonne esistano
-
-                    string query = JsonToQuery(obj);
-
-                    using (var cmd = new SQLiteCommand(query, conn))
+                    foreach (var path in filespath)
                     {
-                        cmd.ExecuteNonQuery();
-                    }
-                }
-            }
+                        int totalLines = File.ReadLines(path).Count();
+                        int processedLines = 0;
 
-            dataGridView1.DataSource = LoadTable("Logs");
-            filespath.Clear();
-            lsv_FilesPath.Clear();
+                        foreach (var Json in ReadJsonObjects(path))
+                        {
+                            string fixedJson = FixInvalidJson(Json);
+                            var obj = JObject.Parse(fixedJson);
+
+                            EnsureColumnsExist(obj); // assicura le colonne
+
+                            string query = JsonToQuery(obj);
+
+                            using (var cmd = new SQLiteCommand(query, conn))
+                            {
+                                cmd.ExecuteNonQuery();
+                            }
+
+                            processedLines++;
+                            int percentLines = (int)((processedLines / (double)totalLines) * 100);
+
+                            // aggiorna progress bar sul thread UI
+                            this.Invoke(new Action(() =>
+                            {
+                                progressDialog.UpdateProgress(percentLines,
+                                    $"File {processedFiles + 1}/{totalFiles} - Riga {processedLines}/{totalLines}");
+                            }));
+                        }
+
+                        processedFiles++;
+                    }
+                });
+            }
+            finally
+            {
+                // aggiorna la griglia dopo
+                dataGridView1.DataSource = LoadTable("Logs");
+
+                // chiudi progress dialog
+                progressDialog.Close();
+
+                filespath.Clear();
+                lsv_FilesPath.Items.Clear();
+
+                btn_AddToData.Enabled = true;
+            }
         }
 
         private string JsonToQuery(JObject obj)
@@ -154,14 +192,13 @@ namespace LogTool
 
                 if (braceCount == 0 && sb.Length > 0)
                 {
-                    // JSON completo
                     yield return sb.ToString().Trim();
                     sb.Clear();
                 }
             }
 
-            // in caso ci fosse qualcosa rimasto senza chiusura corretta
-            if (sb.Length > 0)
+            // se c’è troppo testo non chiuso → scarto invece di freezare
+            if (sb.Length > 0 && braceCount == 0)
             {
                 yield return sb.ToString().Trim();
             }
@@ -294,6 +331,53 @@ namespace LogTool
             {
                 MessageBox.Show("Errore nella query: " + ex.Message);
             }
+        }
+    }
+
+    public class ProgressDialog : Form
+    {
+        private ProgressBar progressBar;
+        private Label lblStatus;
+
+        public ProgressDialog()
+        {
+            this.Text = "Elaborazione in corso...";
+            this.Size = new Size(400, 100);
+            this.StartPosition = FormStartPosition.CenterParent;
+            this.FormBorderStyle = FormBorderStyle.FixedDialog;
+            this.ControlBox = false; // niente X
+            this.TopMost = true;
+
+            progressBar = new ProgressBar()
+            {
+                Dock = DockStyle.Bottom,
+                Style = ProgressBarStyle.Continuous,
+                Minimum = 0,
+                Maximum = 100,
+                Height = 20
+            };
+
+            lblStatus = new Label()
+            {
+                Dock = DockStyle.Fill,
+                TextAlign = ContentAlignment.MiddleCenter,
+                Text = "Inizializzazione..."
+            };
+
+            this.Controls.Add(lblStatus);
+            this.Controls.Add(progressBar);
+        }
+
+        public void UpdateProgress(int percent, string status = "")
+        {
+            if (percent < 0) percent = 0;
+            if (percent > 100) percent = 100;
+
+            progressBar.Value = percent;
+            if (!string.IsNullOrEmpty(status))
+                lblStatus.Text = status;
+
+            System.Windows.Forms.Application.DoEvents(); // forza refresh UI
         }
     }
 }
