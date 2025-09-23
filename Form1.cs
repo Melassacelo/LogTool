@@ -365,6 +365,38 @@ namespace LogTool
             }
         }
 
+        private void btn_TableReset_Click(object sender, EventArgs e)
+        {
+            btn_TableReset.Enabled = false;
+            try
+            {
+                using (var cmd = new SQLiteCommand(conn))
+                {
+                    // Drop table if it exists
+                    cmd.CommandText = "DROP TABLE IF EXISTS Logs;";
+                    cmd.ExecuteNonQuery();
+
+                    // Recreate the table empty
+                    cmd.CommandText = @"
+                CREATE TABLE Logs (
+                    [time] DATE
+                );";
+                    cmd.ExecuteNonQuery();
+                }
+
+                // Refresh UI elements
+                Combobox1Update();
+                dataGridView1.DataSource = LoadTable("Logs");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error while resetting Logs table: " + ex.Message,
+                                "Error",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error);
+            }
+            btn_TableReset.Enabled = true;
+        }
     }
 
     public class ProgressDialog : Form

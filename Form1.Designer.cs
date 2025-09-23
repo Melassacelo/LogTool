@@ -36,6 +36,7 @@
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.btn_SubmitQuery = new System.Windows.Forms.Button();
             this.comboBox1 = new System.Windows.Forms.ComboBox();
+            this.btn_TableReset = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -68,7 +69,7 @@
             this.btn_AddToData.Enabled = false;
             this.btn_AddToData.Location = new System.Drawing.Point(12, 491);
             this.btn_AddToData.Name = "btn_AddToData";
-            this.btn_AddToData.Size = new System.Drawing.Size(377, 38);
+            this.btn_AddToData.Size = new System.Drawing.Size(377, 45);
             this.btn_AddToData.TabIndex = 2;
             this.btn_AddToData.Text = "Confirm";
             this.btn_AddToData.UseVisualStyleBackColor = true;
@@ -106,17 +107,17 @@
             // 
             this.textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox1.Location = new System.Drawing.Point(636, 499);
+            this.textBox1.Location = new System.Drawing.Point(557, 504);
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(209, 20);
+            this.textBox1.Size = new System.Drawing.Size(241, 20);
             this.textBox1.TabIndex = 5;
             // 
             // btn_SubmitQuery
             // 
             this.btn_SubmitQuery.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btn_SubmitQuery.Location = new System.Drawing.Point(851, 491);
+            this.btn_SubmitQuery.Location = new System.Drawing.Point(804, 491);
             this.btn_SubmitQuery.Name = "btn_SubmitQuery";
-            this.btn_SubmitQuery.Size = new System.Drawing.Size(135, 38);
+            this.btn_SubmitQuery.Size = new System.Drawing.Size(131, 45);
             this.btn_SubmitQuery.TabIndex = 6;
             this.btn_SubmitQuery.Text = "Search";
             this.btn_SubmitQuery.UseVisualStyleBackColor = true;
@@ -127,16 +128,28 @@
             this.comboBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.comboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Location = new System.Drawing.Point(396, 499);
+            this.comboBox1.Location = new System.Drawing.Point(396, 504);
             this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(234, 21);
+            this.comboBox1.Size = new System.Drawing.Size(155, 21);
             this.comboBox1.TabIndex = 7;
+            // 
+            // btn_TableReset
+            // 
+            this.btn_TableReset.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btn_TableReset.Location = new System.Drawing.Point(941, 491);
+            this.btn_TableReset.Name = "btn_TableReset";
+            this.btn_TableReset.Size = new System.Drawing.Size(45, 45);
+            this.btn_TableReset.TabIndex = 8;
+            this.btn_TableReset.Text = "Table Reset";
+            this.btn_TableReset.UseVisualStyleBackColor = true;
+            this.btn_TableReset.Click += new System.EventHandler(this.btn_TableReset_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(998, 541);
+            this.Controls.Add(this.btn_TableReset);
             this.Controls.Add(this.comboBox1);
             this.Controls.Add(this.btn_SubmitQuery);
             this.Controls.Add(this.textBox1);
@@ -162,6 +175,7 @@
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Button btn_SubmitQuery;
         private System.Windows.Forms.ComboBox comboBox1;
+        private System.Windows.Forms.Button btn_TableReset;
     }
 }
 
